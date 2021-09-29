@@ -32,7 +32,7 @@ jobs:
           set -xe
           pip install poetry
           poetry install
-      # - run: "poetry run fourmat check"
+      - run: "poetry run fourmat check"
       - run: "poetry run pytest -vv --log-level=DEBUG"
 
       # We always use a modern Python version for combining coverage to prevent

@@ -1,7 +1,7 @@
-from .config import BaseConfig
 import logging
 from threading import RLock, Timer
 
+from .config import BaseConfig
 from .sender import Sender
 
 logger = logging.getLogger("fourwarder.batcher")

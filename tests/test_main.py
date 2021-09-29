@@ -1,12 +1,12 @@
+import logging
+import time
+from itertools import chain
+from subprocess import call, check_call
+from threading import Thread
+
 from fourwarder.config import BaseConfig
 from fourwarder.main import Main
 from fourwarder.sender import Sender
-from threading import Thread
-from subprocess import check_call, call
-import logging
-from itertools import chain
-import time
-
 
 logging.basicConfig(level=logging.DEBUG)
 

@@ -1,14 +1,15 @@
-import os
-import logging
 import argparse
+import logging
+import os
+import signal
+import traceback
+
 import docker
 from docker.models.containers import Container
-import traceback
-import signal
 
 from .batcher import Batcher
+from .config import BaseConfig, create_config
 from .container_handler import ContainerHandler
-from .config import create_config, BaseConfig
 
 logger = logging.getLogger("fourwarder")
 

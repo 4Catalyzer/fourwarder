@@ -1,8 +1,10 @@
 import logging
-from threading import Thread
-from queue import Queue, Empty
 import time
+from queue import Empty, Queue
+from threading import Thread
+
 import requests
+
 from .config import BaseConfig
 
 logger = logging.getLogger("fourwarder.sender")
