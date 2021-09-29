@@ -1,6 +1,5 @@
 set -eu
 
-poetry version $1
 VERSION_NUMBER=v$(poetry version -s)
 
 rm -rf ./dist/
