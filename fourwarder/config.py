@@ -31,7 +31,6 @@ class BaseConfig:
     BATCH_TIMEOUT_SECONDS = 10
 
     DIE_ON_FAIL = True
-
     RETRIES = 5
 
 

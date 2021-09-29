@@ -1,0 +1,42 @@
+# Adapted from https://github.com/python-attrs/attrs/blob/main/.github/workflows/main.yml
+---
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+    tags:
+      - "*"
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: "Python ${{ matrix.python-version }}"
+    runs-on: "ubuntu-latest"
+    env:
+      USING_COVERAGE: "3.8"
+
+    strategy:
+      matrix:
+        python-version: ["3.6", "3.7", "3.8"]
+
+    steps:
+      - uses: "actions/checkout@v2"
+      - uses: "actions/setup-python@v2"
+        with:
+          python-version: "${{ matrix.python-version }}"
+      - name: "Install dependencies"
+        run: |
+          set -xe
+          pip install poetry
+          poetry install
+      # - run: "poetry run fourmat check"
+      - run: "poetry run pytest"
+
+      # We always use a modern Python version for combining coverage to prevent
+      # parsing errors in older versions for modern code.
+      - uses: "actions/setup-python@v2"
+        with:
+          python-version: "3.8"

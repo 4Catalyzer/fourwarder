@@ -3,6 +3,8 @@ import logging
 import argparse
 import docker
 from docker.models.containers import Container
+import traceback
+import signal
 
 from .batcher import Batcher
 from .container_handler import ContainerHandler
@@ -73,44 +75,54 @@ class EventHandler:
         del self.log_handlers[container_id]
 
     def terminate(self):
-        logger.warn("received termination signal")
         self.event_stream.close()
 
 
-import traceback
+class Main:
+    def __init__(self, config: BaseConfig):
+        self.sender = config.create_sender(
+            thread_panic=self.thread_panic, config=config
+        )
+        self.batcher = Batcher(self.sender, self.thread_panic, config)
+        self.event_handler = EventHandler(self.batcher, self.thread_panic, config)
+        self.termination_exc = None
 
-
-def run():
-    logging.basicConfig(level=logging.INFO)
-
-    parser = argparse.ArgumentParser(description="Process some integers.")
-    parser.add_argument("config_path")
-    config_path = parser.parse_args().config_path
-    config = create_config(config_path)
-
-    termination_exc = None
-    terminate_signal_sent = False
-
-    def thread_panic(func):
+    def thread_panic(self, func):
         """wraps the passed function into a try catch that terminates the main thread."""
 
         def wrapper():
             try:
                 func()
             except Exception:
-                nonlocal termination_exc
-                main.terminate()
-                termination_exc = traceback.format_exc()
+                self.event_handler.terminate()
+                self.termination_exc = traceback.format_exc()
 
         return wrapper
 
-    sender = config.create_sender(thread_panic=thread_panic, config=config)
-    batcher = Batcher(sender, thread_panic, config)
-    main = EventHandler(batcher, thread_panic, config)
+    def run(self):
+        self.sender.start()
+        self.event_handler.run()
 
-    import signal
+    def terminate(self):
+        self.batcher.terminate()
+        self.sender.terminate()
+        self.event_handler.terminate()
+
+
+def run():
+    logging.basicConfig(level=logging.INFO)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("config_path")
+    config_path = parser.parse_args().config_path
+    config = create_config(config_path)
+
+    main = Main(config)
+
+    terminate_signal_sent = False
 
     def terminate_signal_handler(x, y):
+        logger.warn("received termination signal")
         nonlocal terminate_signal_sent
         if not terminate_signal_sent:
             terminate_signal_sent = True
@@ -121,14 +133,8 @@ def run():
 
     signal.signal(signal.SIGINT, terminate_signal_handler)
 
-    sender.start()
-
     main.run()
 
-    logger.info("shutting down")
-    batcher.terminate()
-    sender.terminate()
-
-    if termination_exc:
-        logger.error(termination_exc)
+    if main.termination_exc:
+        logger.error(main.termination_exc)
         exit(1)
