@@ -38,12 +38,10 @@ def test_main():
     main = Main(Config)
     main_thread = Thread(target=main.run)
     main_thread.start()
-    time.sleep(0.1)
 
     docker_bash("for i in {1..7}; do echo $i;  done")
 
-    # time.sleep(0.1)
-
+    time.sleep(0.1)
     main.terminate()
     main_thread.join()
 
@@ -59,15 +57,13 @@ def test_main_filter_container():
     main = Main(MyConfig)
     main_thread = Thread(target=main.run)
     main_thread.start()
-    time.sleep(0.1)
 
     call(["docker", "rm", "foo"])
-
-    # time.sleep(0.1)
     docker_bash("echo container 1", name="foo")
     call(["docker", "rm", "bar"])
     docker_bash("echo container 2", name="bar")
 
+    time.sleep(0.1)
     main.terminate()
     main_thread.join()
 
@@ -85,12 +81,10 @@ def test_main_filter_log():
     main = Main(MyConfig)
     main_thread = Thread(target=main.run)
     main_thread.start()
-    time.sleep(0.1)
 
     docker_bash("for i in {1..13}; do echo $i;  done")
 
-    # time.sleep(0.1)
-
+    time.sleep(0.1)
     main.terminate()
     main_thread.join()
 
@@ -108,15 +102,13 @@ def test_format_log():
     main = Main(MyConfig)
     main_thread = Thread(target=main.run)
     main_thread.start()
-    time.sleep(0.1)
 
     call(["docker", "rm", "foo"])
-
-    # time.sleep(0.1)
     docker_bash("echo container 1", name="foo")
     call(["docker", "rm", "bar"])
     docker_bash("echo container 2", name="bar")
 
+    time.sleep(0.1)
     main.terminate()
     main_thread.join()
 
