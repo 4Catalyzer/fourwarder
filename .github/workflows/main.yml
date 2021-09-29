@@ -15,12 +15,10 @@ jobs:
   tests:
     name: "Python ${{ matrix.python-version }}"
     runs-on: "ubuntu-latest"
-    env:
-      USING_COVERAGE: "3.8"
 
     strategy:
       matrix:
-        python-version: ["3.6", "3.7", "3.8"]
+        python-version: ["3.7", "3.8"]
 
     steps:
       - uses: "actions/checkout@v2"
@@ -34,9 +32,3 @@ jobs:
           poetry install
       - run: "poetry run fourmat check"
       - run: "poetry run pytest -vv --log-level=DEBUG"
-
-      # We always use a modern Python version for combining coverage to prevent
-      # parsing errors in older versions for modern code.
-      - uses: "actions/setup-python@v2"
-        with:
-          python-version: "3.8"
